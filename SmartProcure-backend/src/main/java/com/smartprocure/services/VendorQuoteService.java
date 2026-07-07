@@ -1,0 +1,22 @@
+package com.smartprocure.services;
+
+import java.util.List;
+
+import com.smartprocure.dtos.ApiResponseDto;
+import com.smartprocure.dtos.VendorQuoteRequestDto;
+import com.smartprocure.dtos.VendorQuoteResponseDto;
+
+public interface VendorQuoteService {
+
+	VendorQuoteResponseDto getVendorQuote(Long quoteId);
+
+	List<VendorQuoteResponseDto> getRankedVendorQuotes(Long csId);
+
+	VendorQuoteResponseDto addVendorQuote(VendorQuoteRequestDto vendorQuoteRequestDto);
+
+	VendorQuoteResponseDto updateVendorQuote(Long quoteId, VendorQuoteRequestDto vendorQuoteRequestDto);
+
+
+	ApiResponseDto deleteVendorQuote(Long quoteId);
+
+}
