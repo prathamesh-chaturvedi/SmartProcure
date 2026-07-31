@@ -1,23 +1,62 @@
 package com.smartprocure.security;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
-public class CustomJWTVerificationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class CustomJwtVerificationFilter extends OncePerRequestFilter {
 
+	private final JwtUtils jwtUtils;
+	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		try {
+			
+			String header = request.getHeader("Authorization");
+			
+			if(header != null && header.startsWith("Bearer "))
+			{
+				String jwt = header.substring(7);
+				Claims claims = jwtUtils.validateTokenAndGetClaims(jwt);
+				
+				Long userId = claims.get("user_id", Long.class);
+				Long companyId = claims.get("company_id", Long.class);
+				String role = claims.get("user_role", String.class);
+				
+				JwtPrincipal principal = new JwtPrincipal(userId, companyId);
+				
+				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null,
+						List.of(new SimpleGrantedAuthority(role)));
+				
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			}
+			
+		}
+		catch (Exception e) {
+			SecurityContextHolder.clearContext();
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().print("Invalid JWT !!!");
+			return;
+		}
+		
+		filterChain.doFilter(request, response);
 		
 	}
-
+	
 }
+

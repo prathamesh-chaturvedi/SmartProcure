@@ -45,6 +45,4 @@ public class UserRequestDto {
     @NotNull(message = "Designation is required")
     private Designation designation;
 
-    @NotNull(message = "Company ID is required")
-    private Long companyId;
 }

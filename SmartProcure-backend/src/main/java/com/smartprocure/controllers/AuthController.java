@@ -33,9 +33,9 @@ public class AuthController {
 	}
 	
 	@PatchMapping("/change-password")
-	public ResponseEntity<ApiResponseDto> changePassword(@Valid @RequestBody ChangePasswordRequestDto passwordDto)
+	public ResponseEntity<ApiResponseDto> changePassword(@Valid @RequestBody ChangePasswordRequestDto passwordChange)
 	{
-		return ResponseEntity.ok(authService.changePassword(passwordDto));
+		return ResponseEntity.ok(authService.changePassword(passwordChange));
 	}
 	
 }

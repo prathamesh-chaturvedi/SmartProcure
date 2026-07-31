@@ -20,17 +20,17 @@ public class VendorQuoteResponseDto {
 
     private BigDecimal quotedAmount;
 
-    private String paymentTerms;
+    private BigDecimal transportationCost;
 
-    private String transportationTerms;
+    private BigDecimal effectiveCost;
+
+    private String paymentTerms;
 
     private String deliveryPeriod;
 
     private String validity;
 
     private String warranty;
-
-    private String termsAndConditions;
 
     private String remarks;
 

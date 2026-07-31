@@ -28,7 +28,7 @@ public class ProcurementCase extends BaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "procurement_case_id")
-	private Long ProcuremnetCaseId;
+	private Long procurementCaseId;
 	
 	
 	@Column(name = "procurement_code", unique = true, nullable = false)

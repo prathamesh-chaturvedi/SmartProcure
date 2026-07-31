@@ -22,50 +22,50 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = {"procurementCase"})
 @NoArgsConstructor
-public class VendorQuote extends BaseEntity{
+public class VendorQuote extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "quote_id")
-	private Long quoteId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "quote_id")
+    private Long quoteId;
 
-	@Column(name = "vendor_name", nullable = false)
-	private String vendorName;
+    @Column(name = "vendor_name", nullable = false)
+    private String vendorName;
 
-	@Column(name = "quoted_rate", nullable = false)
-	private BigDecimal quotedRate;
-	
-	@Column(name = "quoted_amount", nullable = false)
-	private BigDecimal quotedAmount;
+    @Column(name = "quoted_rate", nullable = false)
+    private BigDecimal quotedRate;
 
-	@Column(name = "payment_terms")
-	private String paymentTerms;
+    @Column(name = "quoted_amount", nullable = false)
+    private BigDecimal quotedAmount;
 
-	@Column(name = "transportation_terms")
-	private String transportationTerms;
+    @Column(name = "transportation_cost", nullable = false)
+    private BigDecimal transportationCost = BigDecimal.ZERO;
 
-	@Column(name = "delivery_period")
-	private String deliveryPeriod;
+    @Column(name = "effective_cost", nullable = false)
+    private BigDecimal effectiveCost = BigDecimal.ZERO;
 
-	@Column(name = "validity")
-	private String validity;
+    @Column(name = "payment_terms")
+    private String paymentTerms;
 
-	@Column(name = "warranty")
-	private String warranty;
+    @Column(name = "delivery_period")
+    private String deliveryPeriod;
 
-	@Column(name = "terms_and_conditions", length = 2000)
-	private String termsAndConditions;
+    @Column(name = "validity")
+    private String validity;
 
-	@Column(name = "remarks", length = 1000)
-	private String remarks;
+    @Column(name = "warranty")
+    private String warranty;
 
-	@Column(name = "quote_date", nullable = false)
-	private LocalDate quoteDate;
+    @Column(name = "remarks", length = 1000)
+    private String remarks;
 
-	@Column(name = "quote_pdf_path")
-	private String quotePdfPath;
+    @Column(name = "quote_date", nullable = false)
+    private LocalDate quoteDate;
 
-	@ManyToOne
-	@JoinColumn(name = "procurement_case_id", nullable = false)
-	private ProcurementCase procurementCase;
+    @Column(name = "quote_pdf_path")
+    private String quotePdfPath;
+
+    @ManyToOne
+    @JoinColumn(name = "procurement_case_id", nullable = false)
+    private ProcurementCase procurementCase;
 }

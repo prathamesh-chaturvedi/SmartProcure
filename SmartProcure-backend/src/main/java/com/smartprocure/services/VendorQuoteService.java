@@ -8,7 +8,7 @@ import com.smartprocure.dtos.VendorQuoteResponseDto;
 
 public interface VendorQuoteService {
 
-	VendorQuoteResponseDto getVendorQuote(Long quoteId);
+	VendorQuoteResponseDto getVendorQuote(Long quoteId, Long csId);
 
 	List<VendorQuoteResponseDto> getRankedVendorQuotes(Long csId);
 

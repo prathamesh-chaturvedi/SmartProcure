@@ -7,8 +7,8 @@ import com.smartprocure.dtos.LoginRequestDto;
 
 public interface AuthService {
 
-	AuthResponseDto authenticateUser(LoginRequestDto loginRequestDto);
+	AuthResponseDto authenticateUser(LoginRequestDto loginRequest);
 
-	ApiResponseDto changePassword(ChangePasswordRequestDto passwordDto);
+	ApiResponseDto changePassword(ChangePasswordRequestDto password);
 
 }

@@ -28,10 +28,10 @@ public class VendorQuoteController {
 
 	private final VendorQuoteService vendorQuoteService;
 	
-	@GetMapping("/{quoteId}")
-	public ResponseEntity<VendorQuoteResponseDto> getVendorQuote(@PathVariable Long quoteId)
+	@GetMapping("/{quoteId}/{csId}")
+	public ResponseEntity<VendorQuoteResponseDto> getVendorQuote(@PathVariable Long quoteId, @PathVariable Long csId)
 	{
-		return ResponseEntity.ok(vendorQuoteService.getVendorQuote(quoteId));
+		return ResponseEntity.ok(vendorQuoteService.getVendorQuote(quoteId, csId));
 	}
 	
 	

@@ -1,4 +1,3 @@
-
 package com.smartprocure.dtos;
 
 import java.math.BigDecimal;
@@ -24,20 +23,20 @@ public class VendorQuoteRequestDto {
     private String vendorName;
 
     @NotNull(message = "Quoted rate is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Quoted rate must be greater than 0")
-    @Digits(integer = 12, fraction = 2, message = "Quoted rate can have up to 12 digits and 2 decimal places")
+    @DecimalMin(value = "0.01", message = "Quoted rate must be greater than 0")
+    @Digits(integer = 12, fraction = 2,
+            message = "Quoted rate can have up to 12 digits and 2 decimal places")
     private BigDecimal quotedRate;
 
-    @NotNull(message = "Quoted amount is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Quoted amount must be greater than 0")
-    @Digits(integer = 15, fraction = 2, message = "Quoted amount can have up to 15 digits and 2 decimal places")
-    private BigDecimal quotedAmount;
+    @NotNull(message = "Transportation cost is required")
+    @DecimalMin(value = "0.0", inclusive = true,
+            message = "Transportation cost cannot be negative")
+    @Digits(integer = 15, fraction = 2,
+            message = "Transportation cost can have up to 15 digits and 2 decimal places")
+    private BigDecimal transportationCost;
 
     @Size(max = 255, message = "Payment terms cannot exceed 255 characters")
     private String paymentTerms;
-
-    @Size(max = 255, message = "Transportation terms cannot exceed 255 characters")
-    private String transportationTerms;
 
     @Size(max = 255, message = "Delivery period cannot exceed 255 characters")
     private String deliveryPeriod;
@@ -47,9 +46,6 @@ public class VendorQuoteRequestDto {
 
     @Size(max = 100, message = "Warranty cannot exceed 100 characters")
     private String warranty;
-
-    @Size(max = 2000, message = "Terms and conditions cannot exceed 2000 characters")
-    private String termsAndConditions;
 
     @Size(max = 1000, message = "Remarks cannot exceed 1000 characters")
     private String remarks;

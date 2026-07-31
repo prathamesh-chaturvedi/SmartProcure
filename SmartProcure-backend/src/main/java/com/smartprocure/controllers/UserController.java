@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.smartprocure.dtos.ApiResponseDto;
 import com.smartprocure.dtos.UserRequestDto;
 import com.smartprocure.dtos.UserResponseDto;
+import com.smartprocure.dtos.UserUpdateDto;
 import com.smartprocure.entities.Designation;
 import com.smartprocure.entities.UserRole;
 import com.smartprocure.services.UserService;
@@ -30,25 +31,26 @@ public class UserController {
 	
 	private final UserService userService;
 	
-	@GetMapping("/{userId}")
-	public ResponseEntity<UserResponseDto> getUser(@PathVariable Long userId)
+	
+	@GetMapping()
+	public ResponseEntity<UserResponseDto> getUser(@RequestParam(required = false) Long userId)
 	{
+		System.out.println("controller");
 		return ResponseEntity.ok(userService.getUser(userId));
 	}
 	
 	
-	@GetMapping
+	@GetMapping("/list")
 	public ResponseEntity<Page<UserResponseDto>> getUsers(
 			@RequestParam(defaultValue = "0") int page,
 	        @RequestParam(defaultValue = "10") int size,
 	        @RequestParam(required = false) String name,
-			@RequestParam(required = false) Long companyId,
 			@RequestParam(required = false) UserRole userRole,
 			@RequestParam(required = false) Designation designation,
 			@RequestParam(required = false) Boolean isActive)
 	{
 		return ResponseEntity.ok(
-				userService.getUsers(page, size, name, companyId, userRole, designation, isActive));
+				userService.getUsers(page, size, name, userRole, designation, isActive));
 	}
 	
 	
@@ -60,10 +62,13 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(userService.addUser(userRequestDto));
 	}
 	
-	@PutMapping("/{userId}")
-	public ResponseEntity<UserResponseDto> updateUser(@PathVariable Long userId, @RequestBody @Valid UserRequestDto userRequestDto)
+	
+	@PutMapping()
+	public ResponseEntity<UserResponseDto> updateUser(
+					@RequestParam(required = false) Long userId,
+					@RequestBody @Valid UserUpdateDto userUpdateDto)
 	{
-		return ResponseEntity.ok(userService.updateUser(userId, userRequestDto));
+		return ResponseEntity.ok(userService.updateUser(userId, userUpdateDto));
 	}
 	
 	

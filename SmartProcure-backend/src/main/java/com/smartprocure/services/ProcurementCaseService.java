@@ -12,27 +12,36 @@ import com.smartprocure.entities.ProcurementStatus;
 
 public interface ProcurementCaseService {
 
-	ProcurementResponseDto getProcurementCaseById(Long csId);
-	
-	
-//	TODO if (minAmount != null && maxAmount != null
-//    && minAmount.compareTo(maxAmount) > 0) {
-//throw new BadRequestException("Minimum amount cannot be greater than maximum amount.");
-//}
-	Page<ProcurementResponseDto> getProcurementCases(Long userId, int page, int size, ProcurementStatus status, String procurementCode, String title,
-			BigDecimal minAmount, BigDecimal maxAmount, LocalDate fromDate, LocalDate toDate);
+    ProcurementResponseDto getProcurementCaseById(Long csId);
 
+    /*
+     * CHANGED:
+     * Removed userId.
+     * Logged-in user's details will be obtained from CurrentUserService.
+     */
+    Page<ProcurementResponseDto> getProcurementCases(
+            int page,
+            int size,
+            ProcurementStatus status,
+            String procurementCode,
+            String title,
+            BigDecimal minAmount,
+            BigDecimal maxAmount,
+            LocalDate fromDate,
+            LocalDate toDate);
 
-	//FIXME remove userid once jwt
-	ProcurementResponseDto createProcurementCase(Long userId, ProcurementRequestDto procurementRequestDto);
+    /*
+     * CHANGED:
+     * Removed userId.
+     * Logged-in user will become the creator automatically.
+     */
+    ProcurementResponseDto createProcurementCase(
+            ProcurementRequestDto procurementRequestDto);
 
-	ProcurementResponseDto updateProcurementCase(Long csId, ProcurementRequestDto procurementRequestDto);
+    ProcurementResponseDto updateProcurementCase(
+            Long csId,
+            ProcurementRequestDto procurementRequestDto);
 
-	ApiResponseDto deleteProcurementCase(Long csId);
+    ApiResponseDto deleteProcurementCase(Long csId);
 
-	
-
-	
-	
 }
-
