@@ -30,6 +30,18 @@ public class AccessValidator {
         }
     }
 
+    public void validateUserAccess(Long companyId) {
+
+        if (!currentUserService.getCurrentUserRole().equals(UserRole.MASTER_ADMIN)
+                && !currentUserService.getCurrentUserCompanyId()
+                        .equals(companyId)) {
+
+        	throw new AccessDeniedException(
+        	        "You are not authorized to access the approval matrix for this company.");
+        }
+    }
+    
+    
     public void validateUserAccess(User user) {
 
         if (!currentUserService.getCurrentUserRole().equals(UserRole.MASTER_ADMIN)
