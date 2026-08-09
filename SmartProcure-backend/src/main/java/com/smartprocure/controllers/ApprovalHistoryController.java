@@ -6,11 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartprocure.dtos.ApiResponseDto;
 import com.smartprocure.dtos.ApprovalDecisionDto;
+import com.smartprocure.dtos.ApprovalHistoryResponseDto;
 import com.smartprocure.dtos.ProcurementResponseDto;
 import com.smartprocure.services.ApprovalHistoryService;
 
@@ -28,10 +30,17 @@ public class ApprovalHistoryController {
 	@GetMapping("/pending-approval/{userId}")
 	public ResponseEntity<List<ProcurementResponseDto>> getPendingProcurementCases()
 	{
-		return ResponseEntity.ok(
+		return ResponseEntity.ok(	
 				approvalHistoryService.getPendingProcurementCases());
 	}
 	
+	@GetMapping("/history/{csId}")
+	public ResponseEntity<List<ApprovalHistoryResponseDto>> getApprovalHistory(
+	        @PathVariable Long csId) {
+
+	    return ResponseEntity.ok(
+	            approvalHistoryService.getApprovalHistory(csId));
+	}
 	
 	//TODO also add create approval history method in serviceimpl
 	@PatchMapping("/{csId}/submit")
@@ -43,7 +52,7 @@ public class ApprovalHistoryController {
 	
 	//TODO before approve check whether approver has authority in ApprovalMatrix
 	@PatchMapping("/{csId}/approve")
-	public ResponseEntity<ApiResponseDto> approveProcurementCase(@PathVariable Long csId, ApprovalDecisionDto approvalDecisionDto)
+	public ResponseEntity<ApiResponseDto> approveProcurementCase(@PathVariable Long csId, @RequestBody ApprovalDecisionDto approvalDecisionDto)
 	{
 		return ResponseEntity.ok(approvalHistoryService.approveProcurementCase(csId, approvalDecisionDto));
 	}
@@ -51,7 +60,7 @@ public class ApprovalHistoryController {
 	
 	//TODO before rejecting check whether approver has authority in ApprovalMatrix
 	@PatchMapping("/{csId}/reject")
-	public ResponseEntity<ApiResponseDto> rejectProcurementCase(@PathVariable Long csId, ApprovalDecisionDto approvalDecisionDto)
+	public ResponseEntity<ApiResponseDto> rejectProcurementCase(@PathVariable Long csId, @RequestBody ApprovalDecisionDto approvalDecisionDto)
 	{
 		return ResponseEntity.ok(approvalHistoryService.rejectProcurementCase(csId, approvalDecisionDto));
 	}

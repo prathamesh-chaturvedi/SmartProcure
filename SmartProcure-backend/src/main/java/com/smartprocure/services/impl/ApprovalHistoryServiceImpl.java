@@ -11,10 +11,12 @@ import com.smartprocure.custom_exceptions.InvalidInputException;
 import com.smartprocure.custom_exceptions.ResourceNotFoundException;
 import com.smartprocure.dtos.ApiResponseDto;
 import com.smartprocure.dtos.ApprovalDecisionDto;
+import com.smartprocure.dtos.ApprovalHistoryResponseDto;
 import com.smartprocure.dtos.ProcurementResponseDto;
 import com.smartprocure.entities.Action;
 import com.smartprocure.entities.ApprovalHistory;
 import com.smartprocure.entities.ApprovalMatrix;
+import com.smartprocure.entities.Designation;
 import com.smartprocure.entities.ProcurementCase;
 import com.smartprocure.entities.ProcurementStatus;
 import com.smartprocure.entities.VendorQuote;
@@ -97,13 +99,15 @@ public class ApprovalHistoryServiceImpl implements ApprovalHistoryService {
 
 	@Override
 	public ApiResponseDto approveProcurementCase(Long csId, 
-			ApprovalDecisionDto approvalDecisionDto) {
+			 ApprovalDecisionDto approvalDecisionDto) {
 
 	    ApprovalHistory currentApproval =
 	            getPendingApprovalHistory(csId);
 
 	    validateCurrentApprover(currentApproval);
 
+	    currentApproval.setRemarks(
+	            approvalDecisionDto.getRemarks());
 	    currentApproval.setAction(Action.APPROVED);
 
 	    ApprovalMatrix nextApprovalMatrix =
@@ -154,19 +158,58 @@ public class ApprovalHistoryServiceImpl implements ApprovalHistoryService {
 
 	    validateCurrentApprover(currentApproval);
 
+	    currentApproval.setRemarks(
+	            approvalDecisionDto.getRemarks());
 	    currentApproval.setAction(Action.REJECTED);
 
 	    ProcurementCase procurementCase =
 	            currentApproval.getProcurementCase();
 
-	    procurementCase.setStatus(
-	            ProcurementStatus.REJECTED);
+	    procurementCase.setStatus(ProcurementStatus.DRAFT);
+	    procurementCase.setDraftNumber(
+	            procurementCase.getDraftNumber() + 1);
 
 	    emailService.sendRejectionEmail(procurementCase);
 
 	    return new ApiResponseDto(
 	            "Procurement case rejected successfully.",
 	            "Success");
+	}
+	
+	
+	@Override
+	public List<ApprovalHistoryResponseDto> getApprovalHistory(Long csId) {
+
+	    ProcurementCase procurementCase = procurementCaseRepo.findById(csId)
+	            .orElseThrow(() ->
+	                    new ResourceNotFoundException("Invalid Procurement Case Id"));
+
+	    accessValidator.validateUserAccess(procurementCase.getCreatedBy());
+	    
+	    if (currentUser.getCurrentUser().getDesignation() == Designation.PROCUREMENT_EXECUTIVE
+	            && !currentUser.getCurrentUserId()
+	                    .equals(procurementCase.getCreatedBy().getUserId())) {
+
+	        throw new AccessDeniedException(
+	                "You are not authorized to view the approval history of other users' procurement cases.");
+	    }
+
+	    return approvalHistoryRepo
+	            .findByProcurementCaseProcurementCaseIdOrderByApprovalCycleAscApprovalLevelAsc(csId)
+	            .stream()
+	            .map(approvalHistory -> {
+
+	                ApprovalHistoryResponseDto response =
+	                        mapper.map(approvalHistory, ApprovalHistoryResponseDto.class);
+
+	                response.setApproverName(
+	                        approvalHistory.getApprover().getFirstName()
+	                        + " "
+	                        + approvalHistory.getApprover().getLastName());
+
+	                return response;
+	            })
+	            .toList();
 	}
 	
 	/*

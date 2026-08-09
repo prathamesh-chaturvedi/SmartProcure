@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.smartprocure.dtos.ApiResponseDto;
 import com.smartprocure.dtos.ApprovalDecisionDto;
+import com.smartprocure.dtos.ApprovalHistoryResponseDto;
 import com.smartprocure.dtos.ProcurementResponseDto;
 
 public interface ApprovalHistoryService {
@@ -17,4 +18,6 @@ public interface ApprovalHistoryService {
 
 	ApiResponseDto rejectProcurementCase(Long csId, ApprovalDecisionDto approvalDecisionDto);
 
+	List<ApprovalHistoryResponseDto> getApprovalHistory(Long csId);
+	
 }

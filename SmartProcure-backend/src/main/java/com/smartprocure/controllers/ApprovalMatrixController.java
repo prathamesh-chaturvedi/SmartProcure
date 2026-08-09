@@ -28,7 +28,7 @@ public class ApprovalMatrixController {
 	private final ApprovalMatrixService approvalMatrixService;
 	
 	
-	@GetMapping("/{matrixid}")
+	@GetMapping("/{matrixId}")
 	public ResponseEntity<ApprovalMatrixResponseDto> getApprovalMatrix(@PathVariable Long matrixId)
 	{
 		return ResponseEntity.ok(approvalMatrixService.getApprovalMatrix(matrixId));

@@ -19,4 +19,7 @@ public interface ApprovalHistoryRepository extends JpaRepository<ApprovalHistory
 	        Long userId,
 	        Action action);
 	
+	List<ApprovalHistory> findByProcurementCaseProcurementCaseIdOrderByApprovalCycleAscApprovalLevelAsc(
+	        Long csId);
+	
 }

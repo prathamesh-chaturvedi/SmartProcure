@@ -1,7 +1,13 @@
 package com.smartprocure.services.impl;
 
+import org.springframework.stereotype.Service;
+
 import com.smartprocure.services.PdfService;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class PdfServiceImpl implements PdfService {
 
 	@Override
