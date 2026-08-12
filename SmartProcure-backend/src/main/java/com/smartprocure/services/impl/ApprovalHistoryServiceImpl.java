@@ -141,6 +141,9 @@ public class ApprovalHistoryServiceImpl implements ApprovalHistoryService {
 	        pdfService.generateComparativeStatementPdf(
 	                procurementCase.getProcurementCaseId());
 
+	        procurementCase = procurementCaseRepo.findById(procurementCase.getProcurementCaseId())
+	                .orElseThrow();
+	        
 	        emailService.sendApprovalEmail(procurementCase);
 	    }
 

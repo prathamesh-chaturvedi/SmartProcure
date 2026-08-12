@@ -3,8 +3,11 @@ package com.smartprocure.controllers;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,7 @@ import com.smartprocure.dtos.ApiResponseDto;
 import com.smartprocure.dtos.ProcurementRequestDto;
 import com.smartprocure.dtos.ProcurementResponseDto;
 import com.smartprocure.entities.ProcurementStatus;
+import com.smartprocure.services.PdfService;
 import com.smartprocure.services.ProcurementCaseService;
 
 import jakarta.validation.Valid;
@@ -23,7 +27,7 @@ import lombok.AllArgsConstructor;
 public class ProcurementCaseController {
 
     private final ProcurementCaseService procurementCaseService;
-
+    private final PdfService pdfService;
 
     // No change
     @GetMapping("/{csId}")
@@ -66,7 +70,24 @@ public class ProcurementCaseController {
                         toDate));
     }
 
+    // Download CS pdf
+    @GetMapping("/{id}/download-cs")
+    public ResponseEntity<Resource> downloadComparativeStatementPdf(
+            @PathVariable Long id) {
 
+        Resource resource =
+                pdfService.downloadComparativeStatementPdf(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" +
+                                resource.getFilename() + "\"")
+                .body(resource);
+    }
+    
+    
     /*
      * CHANGED:
      * Removed userId from URL.
@@ -108,5 +129,9 @@ public class ProcurementCaseController {
         return ResponseEntity.ok(
                 procurementCaseService.deleteProcurementCase(csId));
     }
+    
+    
+    
+    
 
 }

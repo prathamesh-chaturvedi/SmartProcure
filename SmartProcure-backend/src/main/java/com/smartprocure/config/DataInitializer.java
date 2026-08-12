@@ -41,7 +41,7 @@ public class DataInitializer {
             masterAdmin.setFirstName("Juno");
             masterAdmin.setLastName("Codes");
             masterAdmin.setEmail("masteradmin@gmail.com");
-            masterAdmin.setPassword(passwordEncoder.encode("Juno123"));
+            masterAdmin.setPassword(passwordEncoder.encode("Juno@123"));
 
             masterAdmin.setUserRole(UserRole.MASTER_ADMIN);
             masterAdmin.setDesignation(Designation.SYSTEM_ADMINISTRATOR);

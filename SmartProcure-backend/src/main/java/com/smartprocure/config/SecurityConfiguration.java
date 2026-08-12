@@ -32,6 +32,8 @@ public class SecurityConfiguration {
 		
 		http.csrf(csrf -> csrf.disable());
 		
+		http.cors(cors -> {});
+		
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		
 		http.exceptionHandling(exception-> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));

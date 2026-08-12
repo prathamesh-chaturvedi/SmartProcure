@@ -1,7 +1,8 @@
 package com.smartprocure.services.impl;
 
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.smartprocure.entities.ProcurementCase;
@@ -14,19 +15,31 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender mailSender;
+	private final JavaMailSender mailSender;
+	
+	@Override
+	public void sendEmail(String to, String subject, String body) {
 
-    @Override
-    public void sendEmail(String to, String subject, String body) {
+	    try {
+	        MimeMessage message = mailSender.createMimeMessage();
 
-        SimpleMailMessage message = new SimpleMailMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
+	        helper.setFrom("smartprocure.project@gmail.com");
+	        helper.setTo(to);
+	        helper.setSubject(subject);
 
-        mailSender.send(message);
-    }
+	        // true = HTML email
+	        helper.setText(body, true);
+
+	        System.out.println("Sending HTML mail");
+
+	        mailSender.send(message);
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("Failed to send email", e);
+	    }
+	}
 
     @Override
     public void sendApprovalEmail(ProcurementCase procurementCase) {
@@ -37,24 +50,62 @@ public class EmailServiceImpl implements EmailService {
     	
         String subject = "Procurement Approved - "
                 + procurementCase.getProcurementCode();
-
+        
         String body = """
-                Dear %s,
+        		<html>
+        		<body style="font-family: Arial, sans-serif; font-size:14px; color:#333333;">
 
-                Your procurement case has been approved.
+        		<p>Dear <b>%s</b>,</p>
 
-                Procurement Code : %s
-                Title            : %s
+        		<p>Your procurement case has been <span style="color:green;font-weight:bold;">APPROVED</span>.</p>
 
-                The Comparative Statement has been generated and is available in the system.
+        		<table cellpadding="5" cellspacing="0">
+        		    <tr>
+        		        <td><b>Procurement Code</b></td>
+        		        <td>%s</td>
+        		    </tr>
+        		    <tr>
+        		        <td><b>Title</b></td>
+        		        <td>%s</td>
+        		    </tr>
+        		</table>
 
-                Regards,
-                SmartProcure
-                """.formatted(
-                procurementCase.getCreatedBy().getFirstName(),
-                procurementCase.getProcurementCode(),
-                procurementCase.getTitle());
+        		<p>
+        		The Comparative Statement PDF has been generated successfully.
+        		</p>
 
+        		<p>
+        		<a href="http://localhost:5173/procurement-cases/%d"
+        		style="
+        		background:#198754;
+        		color:white;
+        		padding:10px 18px;
+        		text-decoration:none;
+        		border-radius:5px;
+        		font-weight:bold;">
+        		View Procurement Case
+        		</a>
+        		</p>
+
+        		<p>
+        		<b>PDF Location</b><br>
+        		%s
+        		</p>
+
+        		<br>
+
+        		<p>Regards,<br>
+        		<b>SmartProcure</b></p>
+
+        		</body>
+        		</html>
+        		""".formatted(
+        		        procurementCase.getCreatedBy().getFirstName(),
+        		        procurementCase.getProcurementCode(),
+        		        procurementCase.getTitle(),
+        		        procurementCase.getProcurementCaseId(),
+        		        procurementCase.getCsPdfPath());
+        System.out.println("sendApprovalEmail called");
         sendEmail(
                 procurementCase.getCreatedBy().getEmail(),
                 subject,
@@ -68,22 +119,54 @@ public class EmailServiceImpl implements EmailService {
                 + procurementCase.getProcurementCode();
 
         String body = """
-                Dear %s,
+        		<html>
+        		<body style="font-family: Arial, sans-serif; font-size:14px; color:#333333;">
 
-                Your procurement case has been rejected.
+        		<p>Dear <b>%s</b>,</p>
 
-                Procurement Code : %s
-                Title            : %s
+        		<p>Your procurement case has been <span style="color:red;font-weight:bold;">REJECTED</span>.</p>
 
-                Please login to SmartProcure to review the remarks.
+        		<table cellpadding="5" cellspacing="0">
+        		    <tr>
+        		        <td><b>Procurement Code</b></td>
+        		        <td>%s</td>
+        		    </tr>
+        		    <tr>
+        		        <td><b>Title</b></td>
+        		        <td>%s</td>
+        		    </tr>
+        		</table>
 
-                Regards,
-                SmartProcure
-                """.formatted(
-                procurementCase.getCreatedBy().getFirstName(),
-                procurementCase.getProcurementCode(),
-                procurementCase.getTitle());
+        		<p>
+        		Please review the remarks and make the necessary changes.
+        		</p>
 
+        		<p>
+        		<a href="http://localhost:5173/procurement-cases/%d"
+        		style="
+        		background:#dc3545;
+        		color:white;
+        		padding:10px 18px;
+        		text-decoration:none;
+        		border-radius:5px;
+        		font-weight:bold;">
+        		View Procurement Case
+        		</a>
+        		</p>
+
+        		<br>
+
+        		<p>Regards,<br>
+        		<b>SmartProcure</b></p>
+
+        		</body>
+        		</html>
+        		""".formatted(
+        		        procurementCase.getCreatedBy().getFirstName(),
+        		        procurementCase.getProcurementCode(),
+        		        procurementCase.getTitle(),
+        		        procurementCase.getProcurementCaseId());
+        System.out.println("sendRejectionEmail called");
         sendEmail(
                 procurementCase.getCreatedBy().getEmail(),
                 subject,
@@ -105,28 +188,57 @@ public class EmailServiceImpl implements EmailService {
                 + procurementCase.getProcurementCode();
 
         String body = """
-                Dear %s,
+        		<html>
+        		<body style="font-family: Arial, sans-serif; font-size:14px; color:#333333;">
 
-                A procurement case requires your approval.
+        		<p>Dear <b>%s</b>,</p>
 
-                Procurement Code : %s
-                Title            : %s
-                Submitted By     : %s %s
+        		<p>A procurement case requires your approval.</p>
 
-                Please review the procurement using the link below:
+        		<table cellpadding="5" cellspacing="0">
+        		    <tr>
+        		        <td><b>Procurement Code</b></td>
+        		        <td>%s</td>
+        		    </tr>
+        		    <tr>
+        		        <td><b>Title</b></td>
+        		        <td>%s</td>
+        		    </tr>
+        		    <tr>
+        		        <td><b>Submitted By</b></td>
+        		        <td>%s %s</td>
+        		    </tr>
+        		</table>
 
-                http://localhost:3000/procurement-cases/%d
+        		<p>Please review the procurement case by clicking the button below.</p>
 
-                Regards,
-                SmartProcure
-                """.formatted(
-                approver.getFirstName(),
-                procurementCase.getProcurementCode(),
-                procurementCase.getTitle(),
-                procurementCase.getCreatedBy().getFirstName(),
-                procurementCase.getCreatedBy().getLastName(),
-                procurementCase.getProcurementCaseId());
+        		<p>
+        		    <a href="http://localhost:5173/procurement-cases/%d"
+        		       style="
+        		            background-color:#0d6efd;
+        		            color:white;
+        		            text-decoration:none;
+        		            padding:10px 18px;
+        		            border-radius:5px;
+        		            display:inline-block;
+        		            font-weight:bold;">
+        		        Review Procurement
+        		    </a>
+        		</p>
 
+        		<p>Regards,<br>
+        		<b>SmartProcure</b></p>
+
+        		</body>
+        		</html>
+        		""".formatted(
+        		        approver.getFirstName(),
+        		        procurementCase.getProcurementCode(),
+        		        procurementCase.getTitle(),
+        		        procurementCase.getCreatedBy().getFirstName(),
+        		        procurementCase.getCreatedBy().getLastName(),
+        		        procurementCase.getProcurementCaseId());
+        System.out.println("sendReviewEmail called");
         sendEmail(
                 approver.getEmail(),
                 subject,

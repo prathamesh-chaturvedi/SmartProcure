@@ -1,12 +1,18 @@
 package com.smartprocure.services.impl;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.smartprocure.custom_exceptions.InvalidInputException;
 import com.smartprocure.custom_exceptions.ResourceNotFoundException;
@@ -223,6 +229,62 @@ public class VendorQuoteServiceImpl implements VendorQuoteService {
 	            vendorQuote.getProcurementCase().getProcurementCode());
 
 	    return response;
+	}
+
+	@Override
+	public void uploadQuotePdf(Long quoteId, MultipartFile file) {
+
+	    VendorQuote quote = vendorQuoteRepository.findById(quoteId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Vendor Quote not found."));
+
+	    try {
+
+	        String uploadDir = "uploads/vendor_quotes/";
+	        File dir = new File(uploadDir);
+
+	        if (!dir.exists()) {
+	            dir.mkdirs();
+	        }
+
+	        String fileName = "VQ_" + quoteId + ".pdf";
+	        String filePath = uploadDir + fileName;
+
+	        file.transferTo(new File(filePath));
+
+	        quote.setQuotePdfPath(filePath);
+
+	        vendorQuoteRepository.save(quote);
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("Failed to upload vendor quote PDF.", e);
+	    }
+	}
+
+	@Override
+	public Resource getQuotePdf(Long quoteId) {
+
+	    VendorQuote quote = vendorQuoteRepository.findById(quoteId)
+	            .orElseThrow(() -> new ResourceNotFoundException("Vendor Quote not found."));
+
+	    if (quote.getQuotePdfPath() == null) {
+	        throw new ResourceNotFoundException("Vendor Quote PDF not found.");
+	    }
+
+	    try {
+
+	        Path path = Paths.get(quote.getQuotePdfPath());
+
+	        Resource resource = new UrlResource(path.toUri());
+
+	        if (!resource.exists() || !resource.isReadable()) {
+	            throw new RuntimeException("Unable to read Vendor Quote PDF.");
+	        }
+
+	        return resource;
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("Error reading Vendor Quote PDF.", e);
+	    }
 	}
 
 }
